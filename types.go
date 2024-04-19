@@ -1,7 +1,8 @@
 package main
 
 import (
-	"math/rand"
+	"math/rand"	
+	"time"
 )
 
 type BodyReq struct {
@@ -10,22 +11,23 @@ type BodyReq struct {
 }
 
 type Account struct {
-	ID            int    `json:"id"`
 	firstName     string `json:"firstName"`
 	lastName      string `json:"lastName"`
 	accountNumber int    `json:"accountNumber"`
 	balance       int64  `json:"balance"`
+	created_at    time.Time `json:"created_at"`
 }
 
 // the abov struct with json annotation implies thatw when this data got serialized it will converted to respective labels in json
 
 func NewAccount(firstName string, lastName string) *Account {
 	return &Account{
-		ID:            rand.Intn(1000),
 		firstName:     firstName,
 		lastName:      lastName,
 		accountNumber: rand.Intn(10000),
 		balance:       0,
+		created_at:   time.Now().UTC(),
+
 	}
 }
 
