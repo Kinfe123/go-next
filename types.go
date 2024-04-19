@@ -4,6 +4,11 @@ import (
 	"math/rand"
 )
 
+type BodyReq struct {
+	FirstName string `json:"firstName"`
+	LastName string`json:"lastName"`
+}
+
 type Account struct {
 	ID            int    `json:"id"`
 	firstName     string `json:"firstName"`

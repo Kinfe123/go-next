@@ -74,11 +74,14 @@ func (s *EndPointServices) handleEntity(w http.ResponseWriter, r *http.Request) 
 
 }
 func (s *EndPointServices) handleCreateEntity(w http.ResponseWriter, r *http.Request) error {
+	createAccReq := BodyReq{}
+	if err := json.NewDecoder(r.Body).Decode(&createAccReq); err != nil {
+		return err
+	}
+	account := NewAccount(createAccReq.FirstName , createAccReq.LastName)
+	return AttachJSON(w , http.StatusOK , account)
 
-	new_account := NewAccount("Abebe", "Kebede")
-  fmt.Println("The body is : " , new_account)
-	return AttachJSON(w, 200 , new_account)
-}
+}  
 
 func (s *EndPointServices) handleGetEntity(w http.ResponseWriter, r *http.Request) error {
 

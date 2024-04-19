@@ -40,7 +40,7 @@ func NewPgClient() (*PgClient, error) {
 
 	// defer db.Close()
 
-	if err := db.Ping(); err != nil {
+if err := db.Ping(); err != nil {
 		return nil, err
 
 	}
