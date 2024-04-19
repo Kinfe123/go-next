@@ -12,8 +12,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-     fmt.Println("the db is pinging")
-	fmt.Printf("%+v", db)
+	if  err := db.Initialize(); err != nil {
+		log.Fatal(err)
+	}  
+
+	fmt.Println("Fired with account")
 
 	server := NewEndPoint(":3000" , db)
 	server.Fire()

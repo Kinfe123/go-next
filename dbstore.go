@@ -51,8 +51,22 @@ func NewPgClient() (*PgClient, error) {
 
 }
 
-func (db *PgClient) CreateAccount(*Account) error {
-	return nil
+func (db *PgClient) Initialize() error {
+	return db.CreateAccountTable()
+}
+func (db *PgClient) CreateAccountTable() error {
+	query := `create table if not exists account (
+		id serial primary key,
+		first_name varchar(50),
+		last_name varchar(50),
+		number serial,
+		balance serial, 
+		created_at timestamp
+	)`
+
+	_, err := db.db.Exec(query)
+	return err
+
 }
 
 func (db *PgClient) updateAccount(*Account) error {
