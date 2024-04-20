@@ -11,7 +11,7 @@ import (
 
 type EndPointServices struct {
 	listenAddr string
-  store   *PgClient
+	store      *PgClient
 }
 
 type apiFunc func(http.ResponseWriter, *http.Request) error
@@ -19,20 +19,18 @@ type apiFunc func(http.ResponseWriter, *http.Request) error
 type ServiceError struct {
 	ErrorMsg string
 }
-func NewEndPoint(listenAddr string , store *PgClient) *EndPointServices {
+
+func NewEndPoint(listenAddr string, store *PgClient) *EndPointServices {
 	return &EndPointServices{
 		listenAddr: listenAddr,
-    store:store,
-  
-  
-  }
+		store:      store,
+	}
 
 }
 
-func AttachJSON(w http.ResponseWriter, status int, msg any ) error {
-	w.Header().Set("Content-Type", "application/`json")
+func AttachJSON(w http.ResponseWriter, status int, msg any) error {
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
-  fmt.Println("The object is : " , msg)
 	return json.NewEncoder(w).Encode(msg)
 }
 func makeHttpHandler(f apiFunc) http.HandlerFunc {
@@ -49,9 +47,7 @@ func (s *EndPointServices) Fire() {
 	router := mux.NewRouter()
 	router.HandleFunc("/account", makeHttpHandler(s.handleEntity))
 	router.HandleFunc("/account/{id}", makeHttpHandler(s.handleGetEntity))
-  
 
-  
 	log.Println("THe api is running")
 
 	http.ListenAndServe(s.listenAddr, router)
@@ -70,24 +66,26 @@ func (s *EndPointServices) handleEntity(w http.ResponseWriter, r *http.Request) 
 		return s.handleDeleteEntity(w, r)
 	}
 	fmt.Errorf("Method is not allowed")
-  return nil
+	return nil
 
 }
 func (s *EndPointServices) handleCreateEntity(w http.ResponseWriter, r *http.Request) error {
-	createAccReq := BodyReq{}
-	if err := json.NewDecoder(r.Body).Decode(&createAccReq); err != nil {
+	createAccReq := new(BodyReq)
+	if err := json.NewDecoder(r.Body).Decode(createAccReq); err != nil {
 		return err
 	}
-	account := NewAccount(createAccReq.FirstName , createAccReq.LastName)
+
+	account := NewAccount(createAccReq.FirstName, createAccReq.LastName)
+	if err := s.store.createAccount(account); err != nil {
+		return nil
+	}
 	return AttachJSON(w , http.StatusOK , account)
 
-}  
+}
 
 func (s *EndPointServices) handleGetEntity(w http.ResponseWriter, r *http.Request) error {
+	return nil
 
-  id := mux.Vars(r)["id"]
-  fmt.Println("Hello world" , id)
-  return nil
 }
 func (s *EndPointServices) handleDeleteEntity(w http.ResponseWriter, r *http.Request) error {
 	return nil
