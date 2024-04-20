@@ -69,20 +69,19 @@ func (db *PgClient) CreateAccountTable() error {
 
 }
 
-func (db *PgClient) updateAccount(*Account)  error {
+func (db *PgClient) updateAccount(*Account) error {
 	return nil
 }
-func (db *PgClient) GetAccountById(id int) (*Account , error) {
+func (db *PgClient) GetAccountById(id int) (*Account, error) {
 	query := `select * from account where id = $1`
 	account := Account{}
-	row := db.db.QueryRow(query ,  id)
-    err := row.Scan(&account.ID , &account.FirstName , &account.LastName , &account.AccountNumber , &account.Balance , &account.Created_at)	
-	
-	if err != nil {
-		return nil ,err
-	}
-	return &account , nil
+	row := db.db.QueryRow(query, id)
+	err := row.Scan(&account.ID, &account.FirstName, &account.LastName, &account.AccountNumber, &account.Balance, &account.Created_at)
 
+	if err != nil {
+		return nil, err
+	}
+	return &account, nil
 
 }
 
@@ -127,4 +126,20 @@ func (db *PgClient) SelectAllAccount() ([]*Account, error) {
 		accounts = append(accounts, &account)
 	}
 	return accounts, nil
+}
+
+func (db *PgClient) CheckSenderBalance(fromId int) (int64, error) {
+	account, err := db.GetAccountById(fromId)
+	if err != nil {
+		return -1, nil
+	}
+	return account.Balance, nil
+
+}
+
+func (db *PgClient) Debit(fromId int) error {
+	return nil
+}
+func (db *PgClient) Credit(toId int) error {
+	return nil
 }

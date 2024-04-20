@@ -86,7 +86,6 @@ func (s *EndPointServices) handleCreateEntity(w http.ResponseWriter, r *http.Req
 
 func (s *EndPointServices) handleGetEntity(w http.ResponseWriter, r *http.Request) error {
 
-	fmt.Println("THe get all account is fire: ")
 	accounts, err := s.store.SelectAllAccount()
 	if err != nil {
 		return err
@@ -113,7 +112,7 @@ func (s *EndPointServices) handleGetEntityById(w http.ResponseWriter, r *http.Re
 			return nil
 		}
 
-		return AttachJSON(w , http.StatusOK , map[string]int{"id": id})
+		return AttachJSON(w, http.StatusOK, map[string]int{"id": id})
 
 	}
 
@@ -132,7 +131,21 @@ func (s *EndPointServices) handleDeleteEntity(w http.ResponseWriter, r *http.Req
 }
 
 func (s *EndPointServices) handleTransfer(w http.ResponseWriter, r *http.Request) error {
+	transferAcc := Transfer{}
+	if err := json.NewDecoder(r.Body).Decode(&transferAcc); err != nil {
+		return nil
+	}
+	balance, err := s.store.CheckSenderBalance(transferAcc.formAccount)
+	if err != nil {
+		return nil
+	}
+	if balance <  int64(transferAcc.amount) {
+		
+		return fmt.Errorf("Not enough money")
+
+	}
 	return nil
+
 }
 func (s *EndPointServices) hanleWithdraw(w http.ResponseWriter, r *http.Request) error {
 	return nil
