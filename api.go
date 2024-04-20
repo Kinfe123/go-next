@@ -48,7 +48,7 @@ func (s *EndPointServices) Fire() {
 	router := mux.NewRouter()
 	router.HandleFunc("/account", makeHttpHandler(s.handleEntity))
 	router.HandleFunc("/account/{id}", makeHttpHandler(s.handleGetEntityById))
-
+	router.HandleFunc("/account/transfer", makeHttpHandler(s.handleTransfer))
 	log.Println("THe api is running")
 
 	http.ListenAndServe(s.listenAddr, router)
@@ -139,13 +139,19 @@ func (s *EndPointServices) handleTransfer(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		return nil
 	}
-	if balance <  int64(transferAcc.amount) {
-		
+	if balance < int64(transferAcc.amount) {
+
 		return fmt.Errorf("Not enough money")
 
 	}
-	return nil
+	if err := s.store.Debit(transferAcc.formAccount, transferAcc.amount); err != nil {
+		return err
+	}
+	if err := s.store.Credit(transferAcc.toAccount, transferAcc.amount); err != nil {
+		return err
+	}
 
+	return fmt.Errorf("Not allowed to perform the transactions")
 }
 func (s *EndPointServices) hanleWithdraw(w http.ResponseWriter, r *http.Request) error {
 	return nil

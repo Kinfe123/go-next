@@ -137,9 +137,17 @@ func (db *PgClient) CheckSenderBalance(fromId int) (int64, error) {
 
 }
 
-func (db *PgClient) Debit(fromId int) error {
-	return nil
+func (db *PgClient) Debit(fromId int, amount int) error {
+	query := `update account set balance = balance - $1 where id = $2`
+	_, err := db.db.Exec(query, amount, fromId)
+	return err
+
 }
-func (db *PgClient) Credit(toId int) error {
-	return nil
+func (db *PgClient) Credit(toId int, amount int) error {
+
+
+	query := `update account set balance = balance + $1 where id = $2`
+	_, err := db.db.Exec(query,amount , toId)
+	return err
+
 }
