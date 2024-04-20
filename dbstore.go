@@ -69,13 +69,21 @@ func (db *PgClient) CreateAccountTable() error {
 
 }
 
-func (db *PgClient) updateAccount(*Account) error {
+func (db *PgClient) updateAccount(*Account)  error {
 	return nil
 }
-func (db *PgClient) getAccountById(id int) error {
+func (db *PgClient) getAccountById(id int) (*Account , error) {
 	query := `select * from account where id = $1`
-	_, err := db.db.Query(query, id)
-	return err
+	account := Account{}
+	row := db.db.QueryRow(query ,  id)
+    err := row.Scan(&account.ID , &account.FirstName , &account.LastName , &account.AccountNumber , &account.Balance , &account.Created_at)	
+	
+	if err != nil {
+		return nil ,err
+	}
+	return &account , nil
+
+
 }
 
 func (db *PgClient) DeleteAccount(id int) error {
@@ -113,10 +121,9 @@ func (db *PgClient) selectAllAccount() ([]*Account, error) {
 	accounts := []*Account{}
 	for rows.Next() {
 		account := Account{}
-		if err := rows.Scan(&account.ID , &account.FirstName, &account.LastName, &account.AccountNumber, &account.Balance, &account.Created_at); err != nil {
+		if err := rows.Scan(&account.ID, &account.FirstName, &account.LastName, &account.AccountNumber, &account.Balance, &account.Created_at); err != nil {
 			return nil, err
 		}
-		fmt.Println("ROW: " , account)
 		accounts = append(accounts, &account)
 	}
 	return accounts, nil

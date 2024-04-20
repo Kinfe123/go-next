@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -46,7 +47,7 @@ func makeHttpHandler(f apiFunc) http.HandlerFunc {
 func (s *EndPointServices) Fire() {
 	router := mux.NewRouter()
 	router.HandleFunc("/account", makeHttpHandler(s.handleEntity))
-	router.HandleFunc("/account/{id}", makeHttpHandler(s.handleGetEntity))
+	router.HandleFunc("/account/{id}", makeHttpHandler(s.handleGetEntityById))
 
 	log.Println("THe api is running")
 
@@ -87,6 +88,20 @@ func (s *EndPointServices) handleGetEntity(w http.ResponseWriter, r *http.Reques
     
 	fmt.Println("THe get all account is fire: ")
 	accounts , err := s.store.selectAllAccount()
+	if err != nil {
+		return err
+	}
+	return AttachJSON(w , http.StatusOK , accounts)
+}
+
+
+func (s *EndPointServices) handleGetEntityById(w http.ResponseWriter, r *http.Request) error {
+	ids := mux.Vars(r)["id"]
+	idToInt , err := strconv.Atoi(ids)
+	if err != nil {
+		return fmt.Errorf("Invalid params")
+	}
+	accounts , err := s.store.getAccountById(idToInt)
 	if err != nil {
 		return err
 	}
