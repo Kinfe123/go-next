@@ -72,7 +72,7 @@ func (db *PgClient) CreateAccountTable() error {
 func (db *PgClient) updateAccount(*Account)  error {
 	return nil
 }
-func (db *PgClient) getAccountById(id int) (*Account , error) {
+func (db *PgClient) GetAccountById(id int) (*Account , error) {
 	query := `select * from account where id = $1`
 	account := Account{}
 	row := db.db.QueryRow(query ,  id)
@@ -93,13 +93,13 @@ func (db *PgClient) DeleteAccount(id int) error {
 
 }
 
-func (db *PgClient) getAllAccount() error {
+func (db *PgClient) GetAllAccount() error {
 	query := `select * from account`
 	_, err := db.db.Query(query)
 	return err
 }
 
-func (db *PgClient) createAccount(acc *Account) error {
+func (db *PgClient) CreateAccount(acc *Account) error {
 	query := `insert into account (first_name , last_name , number  ,  balance , created_at) values ($1 , $2 , $3 , $4 , $5)`
 	_, err := db.db.Exec(query, acc.FirstName, acc.LastName, acc.AccountNumber, acc.Balance, acc.Created_at)
 	return err
@@ -113,7 +113,7 @@ func (db *PgClient) deleteAllAccount() error {
 
 }
 
-func (db *PgClient) selectAllAccount() ([]*Account, error) {
+func (db *PgClient) SelectAllAccount() ([]*Account, error) {
 	rows, err := db.db.Query(`select * from account`)
 	if err != nil {
 		return nil, err

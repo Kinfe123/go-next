@@ -77,7 +77,7 @@ func (s *EndPointServices) handleCreateEntity(w http.ResponseWriter, r *http.Req
 	}
 
 	account := NewAccount(createAccReq.FirstName, createAccReq.LastName)
-	if err := s.store.createAccount(account); err != nil {
+	if err := s.store.CreateAccount(account); err != nil {
 		return nil
 	}
 	return AttachJSON(w, http.StatusOK, account)
@@ -87,7 +87,7 @@ func (s *EndPointServices) handleCreateEntity(w http.ResponseWriter, r *http.Req
 func (s *EndPointServices) handleGetEntity(w http.ResponseWriter, r *http.Request) error {
 
 	fmt.Println("THe get all account is fire: ")
-	accounts, err := s.store.selectAllAccount()
+	accounts, err := s.store.SelectAllAccount()
 	if err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ func (s *EndPointServices) handleGetEntityById(w http.ResponseWriter, r *http.Re
 	}
 	if r.Method == "GET" {
 
-		accounts, err := s.store.getAccountById(id)
+		accounts, err := s.store.GetAccountById(id)
 		if err != nil {
 			return err
 		}
