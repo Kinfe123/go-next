@@ -14,6 +14,13 @@ type TransferReq struct {
 	ToAccount   int `json:"toAccount"`
 	Amount      int `json:"amount"`
 }
+type WithdrawReq struct {
+	AccountNumber int `json:"accountNumber"`
+    Amount   int `json:"amount"`
+
+}
+
+
 type Account struct {
 	ID            int       `json:"id"`
 	FirstName     string    `json:"firstName"`

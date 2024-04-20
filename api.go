@@ -138,27 +138,47 @@ func (s *EndPointServices) handleTransfer(w http.ResponseWriter, r *http.Request
 	}  
 	
     
-    fmt.Println("hELLO WORLD" , transferAcc)	
 	balance, err := s.store.CheckSenderBalance(transferAcc.FromAccount)
 	if err != nil {
 		return nil
+	
 	}
 	if balance < int64(transferAcc.Amount) {
 
 		return fmt.Errorf("Not enough money")
 
 	}
+    // first the user has to be debited before credit a balance	
+	
 	if err := s.store.Debit(transferAcc.FromAccount, transferAcc.Amount); err != nil {
 		return err
 	}
 	if err := s.store.Credit(transferAcc.ToAccount , transferAcc.Amount); err != nil {
 		return err
 	}
+	return AttachJSON(w , http.StatusOK , map[string]int{"transferred": transferAcc.Amount})
 
-	return fmt.Errorf("Not allowed to perform the transactions")
 }
 func (s *EndPointServices) handleWithdraw(w http.ResponseWriter, r *http.Request) error {
-	return nil
+    id , err := parseIdParas(r)
+    if err != nil {
+		return err
+	}	
+	withdraw := WithdrawReq{}
+	if err := json.NewDecoder(r.Body).Decode(&withdraw); err != nil {
+		return err
+	}
+
+
+	balance , err := s.store.CheckSenderBalance(id) 
+    if balance < int64(withdraw.Amount){
+		return fmt.Errorf("Not enough money")
+	}
+    if err := s.store.Debit(withdraw.AccountNumber , withdraw.Amount); err != nil {
+		return err
+	}
+    return AttachJSON(w , http.StatusOK , map[string]int{"withdrawal": withdraw.Amount})
+
 }
 
 func parseIdParas(r *http.Request) (int, error) {

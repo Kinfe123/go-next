@@ -151,3 +151,8 @@ func (db *PgClient) Credit(toId int, amount int) error {
 	return err
 
 }
+
+func (db *PgClient) Withdraw(fromId int , amount int) error {
+    err := db.Debit(fromId , amount)
+	return err
+}
