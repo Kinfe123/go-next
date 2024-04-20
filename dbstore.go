@@ -93,7 +93,7 @@ func (db *PgClient) getAllAccount() error {
 
 func (db *PgClient) createAccount(acc *Account) error {
 	query := `insert into account (first_name , last_name , number  ,  balance , created_at) values ($1 , $2 , $3 , $4 , $5)`
-	_, err := db.db.Exec(query, acc.firstName, acc.lastName, acc.accountNumber, acc.balance, acc.created_at)
+	_, err := db.db.Exec(query, acc.FirstName, acc.LastName, acc.AccountNumber, acc.Balance, acc.Created_at)
 	return err
 
 }
@@ -113,9 +113,10 @@ func (db *PgClient) selectAllAccount() ([]*Account, error) {
 	accounts := []*Account{}
 	for rows.Next() {
 		account := Account{}
-		if err := rows.Scan(&account.firstName, &account.lastName, &account.accountNumber, &account.balance, &account.created_at); err != nil {
+		if err := rows.Scan(&account.ID , &account.FirstName, &account.LastName, &account.AccountNumber, &account.Balance, &account.Created_at); err != nil {
 			return nil, err
 		}
+		fmt.Println("ROW: " , account)
 		accounts = append(accounts, &account)
 	}
 	return accounts, nil

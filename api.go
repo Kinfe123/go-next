@@ -84,8 +84,13 @@ func (s *EndPointServices) handleCreateEntity(w http.ResponseWriter, r *http.Req
 }
 
 func (s *EndPointServices) handleGetEntity(w http.ResponseWriter, r *http.Request) error {
-	return nil
-
+    
+	fmt.Println("THe get all account is fire: ")
+	accounts , err := s.store.selectAllAccount()
+	if err != nil {
+		return err
+	}
+	return AttachJSON(w , http.StatusOK , accounts)
 }
 func (s *EndPointServices) handleDeleteEntity(w http.ResponseWriter, r *http.Request) error {
 	return nil
