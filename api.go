@@ -80,35 +80,55 @@ func (s *EndPointServices) handleCreateEntity(w http.ResponseWriter, r *http.Req
 	if err := s.store.createAccount(account); err != nil {
 		return nil
 	}
-	return AttachJSON(w , http.StatusOK , account)
+	return AttachJSON(w, http.StatusOK, account)
 
 }
 
 func (s *EndPointServices) handleGetEntity(w http.ResponseWriter, r *http.Request) error {
-    
+
 	fmt.Println("THe get all account is fire: ")
-	accounts , err := s.store.selectAllAccount()
+	accounts, err := s.store.selectAllAccount()
 	if err != nil {
 		return err
 	}
-	return AttachJSON(w , http.StatusOK , accounts)
+	return AttachJSON(w, http.StatusOK, accounts)
 }
-
 
 func (s *EndPointServices) handleGetEntityById(w http.ResponseWriter, r *http.Request) error {
-	ids := mux.Vars(r)["id"]
-	idToInt , err := strconv.Atoi(ids)
-	if err != nil {
-		return fmt.Errorf("Invalid params")
-	}
-	accounts , err := s.store.getAccountById(idToInt)
+	id, err := parseIdParas(r)
 	if err != nil {
 		return err
 	}
-	return AttachJSON(w , http.StatusOK , accounts)
+	if r.Method == "GET" {
+
+		accounts, err := s.store.getAccountById(id)
+		if err != nil {
+			return err
+		}
+		return AttachJSON(w, http.StatusOK, accounts)
+	}
+	if r.Method == "DELETE" {
+		err := s.store.DeleteAccount(id)
+		if err != nil {
+			return nil
+		}
+
+		return AttachJSON(w , http.StatusOK , map[string]int{"id": id})
+
+	}
+
+	return fmt.Errorf("Method not allowed")
 }
 func (s *EndPointServices) handleDeleteEntity(w http.ResponseWriter, r *http.Request) error {
-	return nil
+	id, err := parseIdParas(r)
+	if err != nil {
+		return err
+
+	}
+	if err := s.store.DeleteAccount(id); err != nil {
+		return nil
+	}
+	return AttachJSON(w, http.StatusOK, map[string]int{"id": id})
 }
 
 func (s *EndPointServices) handleTransfer(w http.ResponseWriter, r *http.Request) error {
@@ -116,4 +136,14 @@ func (s *EndPointServices) handleTransfer(w http.ResponseWriter, r *http.Request
 }
 func (s *EndPointServices) hanleWithdraw(w http.ResponseWriter, r *http.Request) error {
 	return nil
+}
+
+func parseIdParas(r *http.Request) (int, error) {
+	ids := mux.Vars(r)["id"]
+	idInt, err := strconv.Atoi(ids)
+	if err != nil {
+		return -1, fmt.Errorf("Invalid Params")
+	}
+	return idInt, nil
+
 }
