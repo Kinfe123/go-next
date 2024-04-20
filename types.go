@@ -9,11 +9,10 @@ type BodyReq struct {
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
 }
-type Transfer struct {
-	formAccount int  `json:"fromAccount"`
-	toAccount int   `json:"toAccount"`
-	amount int   `json:"amount"`
-
+type TransferReq struct {
+	FromAccount int `json:"fromAccount"`
+	ToAccount   int `json:"toAccount"`
+	Amount      int `json:"amount"`
 }
 type Account struct {
 	ID            int       `json:"id"`

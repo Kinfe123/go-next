@@ -48,7 +48,7 @@ func (s *EndPointServices) Fire() {
 	router := mux.NewRouter()
 	router.HandleFunc("/account", makeHttpHandler(s.handleEntity))
 	router.HandleFunc("/account/{id}", makeHttpHandler(s.handleGetEntityById))
-	router.HandleFunc("/account/transfer", makeHttpHandler(s.handleTransfer))
+	router.HandleFunc("/transfer", makeHttpHandler(s.handleTransfer))
 	log.Println("THe api is running")
 
 	http.ListenAndServe(s.listenAddr, router)
@@ -131,29 +131,33 @@ func (s *EndPointServices) handleDeleteEntity(w http.ResponseWriter, r *http.Req
 }
 
 func (s *EndPointServices) handleTransfer(w http.ResponseWriter, r *http.Request) error {
-	transferAcc := Transfer{}
+    
+	transferAcc := TransferReq{}
 	if err := json.NewDecoder(r.Body).Decode(&transferAcc); err != nil {
-		return nil
-	}
-	balance, err := s.store.CheckSenderBalance(transferAcc.formAccount)
+		return err
+	}  
+	
+    
+    fmt.Println("hELLO WORLD" , transferAcc)	
+	balance, err := s.store.CheckSenderBalance(transferAcc.FromAccount)
 	if err != nil {
 		return nil
 	}
-	if balance < int64(transferAcc.amount) {
+	if balance < int64(transferAcc.Amount) {
 
 		return fmt.Errorf("Not enough money")
 
 	}
-	if err := s.store.Debit(transferAcc.formAccount, transferAcc.amount); err != nil {
+	if err := s.store.Debit(transferAcc.FromAccount, transferAcc.Amount); err != nil {
 		return err
 	}
-	if err := s.store.Credit(transferAcc.toAccount, transferAcc.amount); err != nil {
+	if err := s.store.Credit(transferAcc.ToAccount , transferAcc.Amount); err != nil {
 		return err
 	}
 
 	return fmt.Errorf("Not allowed to perform the transactions")
 }
-func (s *EndPointServices) hanleWithdraw(w http.ResponseWriter, r *http.Request) error {
+func (s *EndPointServices) handleWithdraw(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
